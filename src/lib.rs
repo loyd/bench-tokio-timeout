@@ -14,6 +14,7 @@ pub async fn baseline(mut rx: Receiver<u64>) -> u64 {
     sum
 }
 
+#[cfg(not(feature = "quanta"))] // `timeout()` cannot be used with `quanta`
 pub async fn timeout(mut rx: Receiver<u64>) -> u64 {
     let mut sum = 0;
 
