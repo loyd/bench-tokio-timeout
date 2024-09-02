@@ -34,6 +34,7 @@ pub async fn sleep(mut rx: Receiver<u64>) -> u64 {
 
     loop {
         select! {
+            biased;
             res = rx.recv() => match res {
                 Some(no) => sum += no,
                 None => break,
@@ -52,26 +53,7 @@ pub async fn reused_sleep(mut rx: Receiver<u64>) -> u64 {
 
     loop {
         select! {
-            res = rx.recv() => match res {
-                Some(no) => {
-                    sum += no;
-                    sleep.as_mut().reset(after(TIMEOUT));
-                },
-                None => break,
-            },
-            () = &mut sleep => panic!("timeout"),
-        }
-    }
-
-    sum
-}
-
-pub async fn reused_boxed_sleep(mut rx: Receiver<u64>) -> u64 {
-    let mut sum = 0;
-    let mut sleep = Box::pin(time::sleep_until(after(TIMEOUT)));
-
-    loop {
-        select! {
+            biased;
             res = rx.recv() => match res {
                 Some(no) => {
                     sum += no;

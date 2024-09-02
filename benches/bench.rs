@@ -13,9 +13,9 @@ macro_rules! bench_impl {
                 let start = Instant::now();
 
                 // We spawn different tasks and use bounded queue with capacity 1
-                // in order to have more fair benchmark.
-                // If the channel is prefilled with all values,
-                // `timeout` has advantage because it never registers a timer.
+                // in order to have more fair benchmark. Otherwise, `Timeout` and
+                // If the channel is prefilled with all values, `Timeout` and `Sleep`
+                // don't have a change to be registered.
                 let actual_sum = rt.block_on(async move {
                     let (tx, rx) = tokio::sync::mpsc::channel(1);
                     tokio::spawn(async move {
@@ -48,7 +48,6 @@ fn bench(c: &mut Criterion) {
     bench_impl!(group, timeout);
     bench_impl!(group, sleep);
     bench_impl!(group, reused_sleep);
-    bench_impl!(group, reused_boxed_sleep);
 }
 
 criterion_group!(benches, bench);
